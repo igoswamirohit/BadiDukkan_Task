@@ -17,9 +17,8 @@ class AuthenticationRepository {
 
   void signInUsingPhone(BuildContext context, String phone){
     _firebaseAuth.verifyPhoneNumber
-      (phoneNumber: phone, verificationCompleted: (phoneAuthCredential) {
-      print('Ver Suceess');
-      print(phoneAuthCredential);
+      (phoneNumber: phone, verificationCompleted: (phoneAuthCredential) async {
+      await _firebaseAuth.signInWithCredential(phoneAuthCredential);
     }, verificationFailed: (error) {
         print('error');
         print(error);

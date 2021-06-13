@@ -39,16 +39,13 @@ class _DetailPageState extends State<DetailPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          widget.onUpdate(
-            Person(
+          widget.onUpdate(Person(
               name: nameController.text,
               mobileNumber: numberController.text,
               age: int.parse(ageController.text),
               address: addressController.text,
               gender: selectedGender.value,
-              skills: skills.value
-            )
-          );
+              skills: skills.value));
           buildSnackBar(context: context, message: 'Data Updated Successfully');
         },
         label: const Text('Submit'),
@@ -74,36 +71,34 @@ class _DetailPageState extends State<DetailPage> {
                   height: 15,
                 ),
                 const Text('Skills'),
-                buildSkills(),
+                StreamBuilder<List<String>>(
+                    stream: skills,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                        return Wrap(
+                          children: List.generate(
+                              snapshot.data!.length,
+                              (index) => Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5),
+                                    child: ChoiceChip(
+                                      label: Text(snapshot.data![index]),
+                                      selected: true,
+                                      selectedColor: Colors.lightBlue,
+                                      labelStyle:
+                                          const TextStyle(color: Colors.black),
+                                    ),
+                                  )),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    }),
                 buildAddSkillBtn(context),
               ],
             ),
           )),
     );
-  }
-
-  Widget buildSkills() {
-    return StreamBuilder<List<String>>(
-        stream: skills,
-        builder: (context, snapshot) {
-          if(snapshot.hasData && snapshot.data!.isNotEmpty){
-            return Wrap(
-              children: List.generate(
-                  snapshot.data!.length,
-                      (index) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    child: ChoiceChip(
-                      label: Text(snapshot.data![index]),
-                      selected: true,
-                      selectedColor: Colors.lightBlue,
-                      labelStyle: const TextStyle(color: Colors.black),
-                    ),
-                  )),
-            );
-          }else{
-            return Container();
-          }
-        });
   }
 
   TextButton buildAddSkillBtn(BuildContext context) {
@@ -123,7 +118,9 @@ class _DetailPageState extends State<DetailPage> {
                       buildTextField(controller: addSkillController),
                       ElevatedButton(
                           onPressed: () {
-                            skills.value.add(addSkillController.text);
+                            var tempSkills = skills.value
+                            ..add(addSkillController.text);
+                            skills.add(tempSkills);
                             addSkillController.clear();
                             Navigator.of(context).pop();
                           },
